@@ -14,8 +14,11 @@ let PADDING;
  * @return {Uint8Array} the padded bytes
  * @see http://tools.ietf.org/html/rfc5652
  */
-export default function pad(plaintext) {
-  const padding = PADDING[(plaintext.byteLength % 16) || 0];
+export default function pad(plaintext, size) {
+
+  size = (size > 16) ? size : 16;
+  init(size);
+  const padding = PADDING[(plaintext.byteLength % size) || 0];
   const result = new Uint8Array(plaintext.byteLength + padding.length);
 
   result.set(plaintext);
@@ -24,61 +27,19 @@ export default function pad(plaintext) {
   return result;
 }
 
-// pre-define the padding values
-PADDING = [
-  [16, 16, 16, 16,
-   16, 16, 16, 16,
-   16, 16, 16, 16,
-   16, 16, 16, 16],
+function init(len)
+{
+  if(!PADDING || PADDING.length != len)
+  {
+    PADDING = Array(len);
+    for(var i=32; i > 0; i--)
+    {
+      PADDING[len - i] = Array(i).fill(i);
+    }
 
-  [15, 15, 15, 15,
-   15, 15, 15, 15,
-   15, 15, 15, 15,
-   15, 15, 15],
+  }
+}
 
-  [14, 14, 14, 14,
-   14, 14, 14, 14,
-   14, 14, 14, 14,
-   14, 14],
 
-  [13, 13, 13, 13,
-   13, 13, 13, 13,
-   13, 13, 13, 13,
-   13],
 
-  [12, 12, 12, 12,
-   12, 12, 12, 12,
-   12, 12, 12, 12],
 
-  [11, 11, 11, 11,
-   11, 11, 11, 11,
-   11, 11, 11],
-
-  [10, 10, 10, 10,
-   10, 10, 10, 10,
-   10, 10],
-
-  [9, 9, 9, 9,
-   9, 9, 9, 9,
-   9],
-
-  [8, 8, 8, 8,
-   8, 8, 8, 8],
-
-  [7, 7, 7, 7,
-   7, 7, 7],
-
-  [6, 6, 6, 6,
-   6, 6],
-
-  [5, 5, 5, 5,
-   5],
-
-  [4, 4, 4, 4],
-
-  [3, 3, 3],
-
-  [2, 2],
-
-  [1]
-];
